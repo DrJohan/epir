@@ -1,0 +1,30 @@
+---
+title: "23_ts"
+author: "Johan Ibrahim"
+date: '2022-04-01'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(rio,          # File import
+               here,         # File locator
+               tidyverse,    # data management + ggplot2 graphics
+               tsibble,      # handle time series datasets
+               slider,       # for calculating moving averages
+               imputeTS,     # for filling in missing values
+               feasts,       # for time series decomposition and autocorrelation
+               forecast,     # fit sin and cosin terms to data (note: must load after feasts)
+               trending,     # fit and assess models 
+               tmaptools,    # for getting geocoordinates (lon/lat) based on place names
+               ecmwfr,       # for interacting with copernicus sateliate CDS API
+               stars,        # for reading in .nc (climate data) files
+               units,        # for defining units of measurement (climate data)
+               yardstick,    # for looking at model accuracy
+               surveillance, # for aberration detection
+               here
+               )
+```
+
+## Time Series exercise
+
