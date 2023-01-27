@@ -1,0 +1,75 @@
+---
+title: "24_epidmodelling"
+author: "Johan Ibrahim"
+date: '2022-04-01'
+output: html_document
+---
+
+```{r setup, include = FALSE}
+
+pacman::p_load(
+  rio,          # File import
+  here,         # File locator
+  tidyverse,    # Data management + ggplot2 graphics
+  epicontacts,  # Analysing transmission networks
+  EpiNow2,      # Rt estimation
+  EpiEstim,     # Rt estimation
+  projections,  # Incidence projections
+  incidence2,   # Handling incidence data
+  epitrix,      # Useful epi functions
+  distcrete     # Discrete delay distributions
+)
+```
+
+```{r}
+here::here()
+
+linelist <- import(here("data", "linelist_cleaned.rds"))
+
+```
+
+```{r}
+table <- linelist %>% 
+  
+  # Get summary values per hospital-outcome group
+  ###############################################
+  group_by(hospital, outcome) %>%                      # Group data
+  summarise(                                           # Create new summary columns of indicators of interest
+    N = n(),                                            # Number of rows per hospital-outcome group     
+    ct_value = median(ct_blood, na.rm=T)) %>%            # median CT value per group
+  # add totals
+  ############
+  bind_rows(                                           # Bind the previous table with this mini-table of totals
+    linelist %>% 
+      filter(!is.na(outcome) & hospital != "Missing") %>%
+      group_by(outcome) %>%                            # Grouped only by outcome, not by hospital    
+      summarise(
+        N = n(),                                       # Number of rows for whole dataset     
+        ct_value = median(ct_blood, na.rm=T))) %>% 
+   # Pivot wider and format
+  ########################
+
+   mutate(hospital = replace_na(hospital, "Total")) %>% 
+  pivot_wider(                                         # Pivot from long to wide
+    values_from = c(ct_value, N),                       # new values are from ct and count columns
+    names_from = outcome) %>%                           # new column names are from outcomes
+  mutate(                                              # Add new columns
+    N_Known = N_Death + N_Recover,                               # number with known outcome
+    Pct_Death = scales::percent(N_Death / N_Known, 0.1),         # percent cases who died (to 1 decimal)
+    Pct_Recover = scales::percent(N_Recover / N_Known, 0.1)) %>% # percent who recovered (to 1 decimal)
+  select(                                              # Re-order columns
+    hospital, N_Known,                                   # Intro columns
+    N_Recover, Pct_Recover, ct_value_Recover,            # Recovered columns
+    N_Death, Pct_Death, ct_value_Death)  %>%             # Death columns
+  arrange(N_Known)                                    # Arrange rows from lowest to highest (Total row at bottom)
+
+table  # print
+  
+```
+```{r}
+
+```
+
+
+
+

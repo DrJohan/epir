@@ -1,0 +1,19 @@
+---
+title: "starwars"
+author: "Johan Ibrahim"
+date: '2022-04-23'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+pacman::p_load("tidyverse",
+               "lubridate", 
+               "janitor")
+data("starwars")
+
+```
+
+## R Markdown
+
